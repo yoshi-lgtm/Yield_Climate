@@ -1,0 +1,77 @@
+# LaTeX生成ファイル
+*.pdf
+*.aux
+*.log
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+*.out
+*.toc
+
+
+# データセット（再取得可能・大容量）
+FashionMNIST/
+MNIST/
+mnist_784
+*-ubyte
+*-ubyte.gz
+*.gpkg
+*.parquet
+*.csv
+*.zip
+*.pptx
+*.nc
+*.xml
+
+# 画像・音声
+*.png
+*.jpg
+*.jpeg
+*.wav
+
+# Python / Jupyter
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# AMD_tools4
+AMD_tools4.py
+AMD_tools4_origin.py
+
+# folder
+/.jupyter
+/LandUseData
+/MetData_Output
+/results
+/ShapeFile
+/yield
+/research/slides
+
+# 生成レポート（sweetviz 等。再生成可能で大きい）
+*.html
+
+# 秘密情報
+.env
+.env.*
+*.secrets.json
+
+# 個人の作業メモ（ユーザー名・メールアドレスを含むため公開しない）
+GIT_WORKFLOW.md
+REPO_CLEANUP.md
+
+# パイプラインの出力先
+/avg_temp
+/avg_temp_all_years
+/paddy
+/total_puddyratio
+/temp_extract
+
+# git バックアップ（漏洩前の履歴を含むのでコミットしない）
+*.bundle

@@ -1,0 +1,13 @@
+* text=auto
+
+*.py   text
+*.R    text
+*.md   text
+*.sh   text eol=lf
+*.ipynb text -diff
+
+*.parquet binary
+*.pkl     binary
+*.gpkg    binary
+*.nc      binary
+*.png     binary
