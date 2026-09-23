@@ -46,5 +46,6 @@ $env:ESTAT_APPID    = "xxxxxxxx"
 
 ## 分析
 
-- `research/model/model.R` — fixest による固定効果モデル（TWFE）
+- `research/model/estimate.R` — **推定の正本**（fixest、TWFE）。表は `research/model/output/` に出力
+- `research/model/legacy/` — 旧世代の推定コード（`model.R`、`twfe.py` ほか。参照用）
 - `research/model/fe_model.ipynb` — Python 側での検討
