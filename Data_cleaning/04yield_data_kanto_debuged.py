@@ -12,7 +12,8 @@ import numpy as np
 # e-Stat の appId。キーはコミットしないので環境変数 ESTAT_APPID に入れて使う。
 #   PowerShell: $env:ESTAT_APPID = "xxxx"
 #   bash:       export ESTAT_APPID=xxxx
-appid = os.environ["ESTAT_APPID"]
+# 取得済みCSVが揃っていれば appid なしでも後段の整形だけ再実行できるようにする
+appid = os.environ.get("ESTAT_APPID", "")
 
 # データの置き場所。環境変数 YIELD_DATA_DIR で上書きできる
 DATA_DIR = Path(os.environ.get("YIELD_DATA_DIR", "."))
@@ -34,7 +35,14 @@ urls = {
 output_path = "api_data"
 
 for year, url in urls.items():
-    response = urllib.request.urlretrieve(url, YIELD_DIR / f"{output_path}_{year}.csv")
+    dest = YIELD_DIR / f"{output_path}_{year}.csv"
+    if dest.exists():
+        print(f"{year}: 取得済みのためダウンロードをスキップ")
+        continue
+    if not appid:
+        raise RuntimeError(
+            f"{dest} が無く、環境変数 ESTAT_APPID も未設定のためダウンロードできません")
+    urllib.request.urlretrieve(url, dest)
 
 # %%
 #1993-2005年のデータを読み込む
@@ -94,6 +102,22 @@ for year in years:
     # 辞書に格納
     data_all[year] = df
 
+# Bug fix: 2022年産以降のAPIは市町村名に都道府県名が付かない（2021は「茨城県_水戸市」、
+#          2022以降は「水戸市」）。後段の抽出は「都道府県名+市町村名」で突き合わせるため、
+#          そのままだと2022-2023が1行も通らなかった。
+#          cat01_code は年をまたいで安定している（関東を含む1,719コードが完全対応）ので、
+#          都道府県名付きの年から対応表を作って補完する。
+_has_pref = {y: d['市町村'].astype(str).str.contains('_').mean() for y, d in data_all.items()}
+_ref_year = max(_has_pref, key=_has_pref.get)
+_code2name = (data_all[_ref_year].drop_duplicates('cat01_code')
+                                 .set_index('cat01_code')['市町村'].astype(str))
+for year, d in data_all.items():
+    if _has_pref[year] < 0.5:
+        filled = d['cat01_code'].map(_code2name)
+        n_filled = int(filled.notna().sum())
+        data_all[year] = d.assign(市町村=filled.fillna(d['市町村']))
+        print(f"{year}: 市町村名に都道府県名を補完（{n_filled}/{len(d)}行、基準年{_ref_year}）")
+
 print(data_all[2021].head())
 
 # %%
@@ -127,6 +151,13 @@ data_1993_2020 = pd.concat(df, ignore_index=True)
 data_2021_2023 = data_2021_2023.drop(columns=["cat01_code", "cat02_code"])
 df = [data_2021_2023, data_1993_2020]
 df_yield = pd.concat(df, ignore_index=True)
+
+# Bug fix: 2021年以降のAPIは市町村名が「茨城県_水戸市」とアンダースコア区切りで返るが、
+#          1993-2020は「茨城県水戸市」と区切りなし。後段の city_list は1993-2020の
+#          名称から作るため、正規化しないと2021-2023が1行も通らず
+#          kanto_yield.csv が2020年止まりになっていた。
+df_yield["市町村"] = (df_yield["市町村"].astype(str)
+                          .str.replace("_", "", regex=False).str.strip())
 #df_yield['時間軸（年次）'].unique()
 
 # %%

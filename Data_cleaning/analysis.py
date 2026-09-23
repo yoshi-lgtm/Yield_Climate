@@ -18,7 +18,7 @@ DATA_DIR = Path(os.environ.get("YIELD_DATA_DIR", "."))
 
 # %%
 # ファイル読み込みと基本統計量
-df = pd.read_csv(DATA_DIR / "results" / "kanto.csv")
+df = pd.read_csv(DATA_DIR / "model" / "kanto_consol.csv")
 df.describe()
 
 #%%

@@ -266,11 +266,19 @@ def calculate_weighted_avg_temp(ds_weather, valid_city_id, data_body, valid_area
 
     # 疎行列 W[c, p] = area[p]  (pixel p が city c に属する場合)
     W = csr_matrix((valid_area, (inverse, np.arange(n_pixels))), shape=(n_cities, n_pixels))
-    denominator = np.asarray(W.sum(axis=1)).flatten()  # 市町村ごとの農地面積合計
 
-    # 重み付き合計: W @ data_body.T → (n_cities, n_time) → 転置して (n_time, n_cities)
-    numerator = np.asarray(W @ data_body.T).T
-    avg_temp = numerator / denominator[np.newaxis, :]
+    # Bug fix: 疎行列積は NaN を伝播させるため、市町村内に NaN ピクセルが
+    #          1つでもあるとその市町村の全期間・全変数が NaN になっていた。
+    #          （実際に 281市町村中7市町村が 68〜267ピクセル中わずか1〜8ピクセルの
+    #            NaN で全損しており、土浦・行方・鹿嶋・かすみがうら等の
+    #            霞ヶ浦沿岸の主要水稲地帯が推定標本から消えていた。）
+    #          有効ピクセルだけで重みを張り直し、分母も時点ごとに計算する。
+    X = np.asarray(data_body, dtype=float).T          # (n_pixels, n_time)
+    mask = np.isfinite(X)
+    numerator = np.asarray(W @ np.where(mask, X, 0.0))          # (n_cities, n_time)
+    denominator = np.asarray(W @ mask.astype(float))            # 時点ごとの有効面積
+    with np.errstate(invalid='ignore', divide='ignore'):
+        avg_temp = np.where(denominator > 0, numerator / denominator, np.nan).T
 
     return pd.DataFrame(avg_temp, index=times, columns=unique_cities)
 

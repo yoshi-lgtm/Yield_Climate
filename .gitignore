@@ -53,6 +53,8 @@ AMD_tools4_origin.py
 /ShapeFile
 /yield
 /research/slides
+/calender_data
+/Consolidation_data
 
 # 生成レポート（sweetviz 等。再生成可能で大きい）
 *.html
