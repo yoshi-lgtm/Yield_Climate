@@ -25,11 +25,14 @@
 
 suppressMessages({library(data.table); library(fixest)})
 
-OUT <- "research/model/output"
+# リポジトリルートからでも親の sotsuron/ からでも動くように解決する
+ROOT <- if (file.exists("research/model/kanto_panel_2000_2023.csv")) "." else "Yield_Climate"
+stopifnot(file.exists(file.path(ROOT, "research/model/kanto_panel_2000_2023.csv")))
+OUT <- file.path(ROOT, "research/model/output")
 dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 setFixest_ssc(ssc(K.fixef = "full"))   # estimate.R と自由度修正を揃える
 
-d <- fread("research/model/kanto_panel_2000_2023.csv", encoding = "UTF-8")
+d <- fread(file.path(ROOT, "research/model/kanto_panel_2000_2023.csv"), encoding = "UTF-8")
 d <- d[!is.na(obs_HD35)]
 setorder(d, city_id, year)
 d[, heat := obs_HD35]
@@ -293,3 +296,27 @@ f_h <- paste("H_pos + H_neg + H_pos:consol30 + H_neg:consol30 +", CTRL)
 show(fit(f_h), "(6) 市町村平均からの偏差を正負に折る")
 show(fit(f_h, sub[year != 2010]), "(6) 同上・2010年除外")
 cat("\n完了（§9）\n")
+
+# ---- 10. bE は期間について安定か -------------------------------------------
+# §6 は bE が「スペック間・2010年除外に対して頑健」と述べたが、期間に対しては
+# 確かめていなかった。修論の E[y] に bE を使えるかを決めるので、ここで検証する。
+cat("\n\n===== 10. bE / bS の期間別安定性 =====\n")
+stab <- rbindlist(lapply(c(list("全期間"), as.list(levels(sub$blk))), function(b) {
+  dd <- if (identical(b, "全期間")) sub else sub[blk == b]
+  m <- feols(log_yield ~ E_ma5 + S_ma5 + GSR_78 + APCP_78 | city_id + year,
+             data = dd, cluster = ~city_id)
+  data.table(period = b, n = nobs(m),
+             bE = coef(m)[["E_ma5"]], se_E = se(m)[["E_ma5"]],
+             bS = coef(m)[["S_ma5"]], se_S = se(m)[["S_ma5"]])
+}))
+stab[, `:=`(t_E = bE / se_E, t_S = bS / se_S)]
+print(stab, digits = 3)
+cat(sprintf("\n期間間の sd: bE = %.5f,  bS = %.5f  → %s の方が不安定\n",
+            sd(stab[period != "全期間", bE]), sd(stab[period != "全期間", bS]),
+            ifelse(sd(stab[period != "全期間", bE]) > sd(stab[period != "全期間", bS]), "bE", "bS")))
+cat("\n--- 2010年除外（全期間）---\n")
+m10 <- feols(log_yield ~ E_ma5 + S_ma5 + GSR_78 + APCP_78 | city_id + year,
+             data = sub[year != 2010], cluster = ~city_id)
+print(round(coeftable(m10)[c("E_ma5", "S_ma5"), 1:3], 5))
+fwrite(stab, file.path(OUT, "surprise_bE_stability.csv"))
+cat("\n完了（§10）\n")
