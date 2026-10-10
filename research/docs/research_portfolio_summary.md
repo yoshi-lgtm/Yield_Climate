@@ -23,17 +23,31 @@
 
 ## 1. 卒業論文
 
-**最終更新：2026年9月24日**（`research/docs/` の分析4本を反映。数値は `research/model/estimate.R` で再現可能）
+**最終更新：2026年10月10日**（主結果を $\omega_t$ 分解に移す決定を反映。T1・T2 の結果を織り込み済み。数値は `research/model/estimate.R` で再現可能）
 
 ### タイトル（案）
-**「水稲の高温障害と圃場整備による緩和効果：関東地域パネルデータによる実証分析」**
 
-副題の候補（分析結果に応じて）：「2010年猛暑のイベント分析」／「高温感応度の非定常性と適応」
+> **2026年10月10日：論文の重心を変更した。** ゼミが農業経済ではなく計量理論であること（実証自体が異端）を踏まえ、主結果を「$\delta$ の推定」から「**プール推定量の estimand の特定**」に移した。水稲・高温害は主題ではなく題材（vehicle）になる。経緯と含意は `goals_and_todo.md` §0・§1。
+
+**「気候被害関数の TWFE 推定における識別変動の集中：連続処置の重み分解と関東水稲パネル」**
+
+副題の候補：「2010年猛暑は何を識別しているか」／「極端年への重みの集中と年別被害関数」
+
+旧案（撤回ではなく降格。$\delta$ は主結果から構成的な後半へ移った）：「水稲の高温障害と圃場整備による緩和効果：関東地域パネルデータによる実証分析」
 
 ### 研究の問い
+
+**主問い（計量）**
+
+- 連続処置（heat × 圃場整備率）を24年でプールした TWFE 推定量は、**何を識別しているか**
+- 気候被害関数では曝露の年次変動が極端年に集中する。このとき推定量の重み $\omega_t$ はどう分布し、年別効果 $\delta_t$ の異質性とどう相互作用するか
+- 識別変動が少数年に集中する設計（単一事象・6都県）で、**妥当な推論は何か**
+
+**従問い（題材側）**
+
 - 登熟期の高温は水稲収量を低下させるか
 - その感応度は圃場整備率によって異なるか（空間的異質性）
-- **その感応度は時間とともに変化しているか**（2010年以降の縮小＝適応の可能性）— 分析の過程で浮上した問い
+- その感応度は時間とともに変化しているか（2010年以降の縮小）
 
 ### 推定モデル
 
@@ -95,6 +109,22 @@ $$\text{GDD}_t = \sum_{\tau=\text{移植日}}^{t} \max(T_\tau - T_{base},\ 0)$$
 
 **核心**：問題は「極端年が足りない」ことではなく、**被害関数が定常でない**ことにある。単一の $\beta$・$\delta$ を24年でプールする定式化は、符号の異なる年効果を平均しているにすぎない。
 
+### プール推定量の estimand（$\omega_t$ 分解）— 主結果
+
+上の診断を、leave-one-year-out ではなく推定量の側から定式化する。連続処置 $D_{it} \equiv H^{+}_{it}\cdot c_i$（$c_i$ = `consol30`）について、$\tilde D_{it}$ を $D$ を他の全回帰子（FE・$H^{+}$・$X$）に射影した残差とすると、真の DGP が年別効果 $\delta_t$ を持つとき FWL から
+
+$$\operatorname{plim}\hat\delta=\sum_t \omega_t\,\delta_t,\qquad \omega_t=\frac{\sum_i E[\tilde D_{it}^2]}{\sum_s\sum_i E[\tilde D_{is}^2]},\qquad \sum_t\omega_t=1,\quad \omega_t\ge 0$$
+
+**$\hat\delta$ は年別効果の「残差化処置の年内分散」加重平均を識別している。** 重みは研究者が選んだものでも、経済的な意味を持つ量でもない。
+
+**重要な区別**：連続処置1本・staggered でないため重みは非負で和が1であり、$\hat\delta$ は正真正銘の加重平均である。したがってこれは de Chaisemartin & D'Haultfoeuille (2020) の**負の重みの問題ではない**。問題は符号ではなく**重みが退化しうること**にあり、系譜としては Angrist (1998) 型の分散加重に属する。負の重みの議論より適用範囲が広い（well-behaved な場合でも推定対象が報告したい対象と乖離する）。
+
+$\tilde D$ の年内分散は $H^{+}$ の大きさにスケールするため、$\omega_t$ は**極端年に集中する**。これは気候被害関数の推定に構造的に内在する性質であり、「極端年を増やせば識別が改善する」という処方がなぜ外れたのかも説明する（`phenology_calibrated_2026-09.md` §6 で提示し `panel_extension_2000_2023.md` §6 で撤回した処方）。**極端年を足すと $\omega_t$ の分布が変わるだけで、$\delta_t$ の異質性は解消しない。**
+
+**予想（要検証）**：HD35 が 9.7 対 9.5 であることから $\omega_{2010}\approx\omega_{2023}$ になるはずだが、$\delta_t$ は片方が大きく正、片方がゼロ。すなわち**同程度の重みを持つ2年で $\delta_t$ が大きく異なり、プール推定値はどちらの年も記述していない**。$\omega_t$ はまだ計算していない（`goals_and_todo.md` T11 が本節の実体）。
+
+**この定式化の利点**：主結果が検定ではなく分解（恒等式＋計算）になるため、**論文が $\delta_{2010}$ の有意性に依存しない。**
+
 ### 識別の妥当性
 
 - 気象は農家行動によって決まらない → 逆因果は原理的に不在
@@ -123,13 +153,17 @@ $$\text{GDD}_t = \sum_{\tau=\text{移植日}}^{t} \max(T_\tau - T_{base},\ 0)$$
 
 **対象地域・期間**：関東6県（茨城・栃木・群馬・埼玉・千葉・神奈川）、2000–2023年、209市町村、4,588行
 
-### 今後の方向性（どれを本筋にするか要判断）
+### 論文の構成（2026年10月10日に確定）
 
-| 方向 | 内容 | 位置づけ |
+~~今後の方向性（どれを本筋にするか要判断）~~ → **決定済み。** 旧 A・B・C の三択は次のように解決した。
+
+| 章 | 内容 | 旧案との対応 |
 |---|---|---|
-| **A. 2010年イベント分析** | 2010年の高温ショックに対する被害の異質性（整備率別）を準実験として推定 | $\delta$ が実質的にそこでしか識別されていない以上、最も誠実 |
-| **B. 適応の分析** | 高温感応度がなぜ2010年以降に縮小したか（品種転換・水管理・**被害の品質への移転**） | それ自体が農業経済学の問い。~~出穂日の前倒しは作期移動の直接証拠~~ → **T2 で棄却**。作期移動はチャネルとして機能していない |
-| **C. 非定常性のモデル化** | $\beta_t$ の時間変化を明示し、その中で整備率との交互作用を評価 | A・B の統合 |
+| **前半（否定的・診断的）** | $\omega_t$ 分解。プール推定量が識別している対象を特定し、$\omega_t$ と $\hat\delta_t$ を24年について並べる | **旧 C を定式化したもの**。$\beta_t$ の時間変化を「モデル化する」のではなく、推定量の重みの側から言明する |
+| **後半（構成的）** | 2010年イベント。推定対象を識別変動に一致させた設計で $\delta_{2010}$ を推定。**パネルのまま年別係数として出す**（2010年断面では heat の地域差が恒常気候とほぼ同義になるため） | **旧 A**。ただし「最も誠実」という消極的理由から「識別されている対象の推定」という積極的理由に変わった |
+| 解釈（落とせる） | $\delta_t$ の異質性はなぜ生じたか（品質への被害移転・品種転換） | **旧 B の残り。** 作期移動は T2 で棄却、サプライズは T1 で棄却。残るは品質（T3）・品種（T7）で、どちらも取れなければ落とす |
+
+推論は仮定集合の異なる4手法を並置する（年のパーミュテーション／Ibragimov–Müller／Canay–Romano–Shaikh／Conley 空間HAC）。**都県ブロックの wild bootstrap は G=6 で機能しないため撤回した。** 詳細は `goals_and_todo.md` §3。
 
 ### 修論への接続
 
@@ -139,6 +173,7 @@ $$\text{GDD}_t = \sum_{\tau=\text{移植日}}^{t} \max(T_\tau - T_{base},\ 0)$$
 | $\hat{\delta} > 0$が有意 | `heat × consol30` IVの**除外制約**の農学的根拠 | 未確認（2010年依存） |
 | $\delta$の地域差 | 適応コストの**空間的異質性**の誘導形的確認 | 未着手 |
 | 高温感応度の縮小 | 修論の「適応行動」の誘導形的証拠 | **作期移動では説明できない**（T2）。サプライズでもない（T1）。残るは品質・品種 |
+| **$\omega_t$ 分解** | **推定段階で構造形を使わない根拠。** プールした係数は年内分散加重平均なので、単一の定数として $\mathbb{E}[y]$ に持ち込めない | 卒論の主結果。修論の設計判断に直結する（&sect;2「期待利潤の構築」(1)） |
 
 `heat × 圃場整備率` を修論で除外制約付きIVとして使う構想は、$\delta$ が特定の1年にしか現れない以上、そのままでは成立が苦しい。**→ IV は Bartik 型に切り替え、`heat` と交差項は外生の共変量（$X$）として直接投入することにした。** したがって $\delta$ の2010年依存は修論の識別を壊さない。
 
@@ -155,6 +190,17 @@ $$\text{GDD}_t = \sum_{\tau=\text{移植日}}^{t} \max(T_\tau - T_{base},\ 0)$$
 | Sakurai (2025) | 本書第5章。GAM による9作物の将来収量予測。1993–2020・市町村・e-Stat＋メッシュ農業気象で**データ源が同一**。右辺は生育前半・後半の**平均気温と日射量のみ**（降水なし）。作期は推奨品種特性表。適応を**空間**（地域別応答曲線）から識別する |
 | Hasegawa et al. (2025) | 本書第4章。**MET26**（出穂後20日の26℃超過分の平均・田面積加重・実測出穂期）が1℃上昇で**一等米比率が15ポイント低下**。関東は MET26 最上位群。2023年の関東はトレンド上。遅植え志向が発育加速で打ち消されたことを指摘 |
 | Wakatsuki et al. (2024) | 高温耐性品種のメタ分析（約1300圃場）。MET26 = 2℃ で白未熟粒率が weak 45% / medium 24% / tolerant 11%。耐性ランクは2017年に5段階で標準化（Sato 2017） |
+
+**計量（主結果に対応。書誌は要確認 — この文書群では Mimura & Takewaka の誤引用で一度やられている）**
+
+| 文献 | 関連性 |
+|---|---|
+| de Chaisemartin & D'Haultfoeuille (2020) | TWFE の負の重み。**本稿は連続処置1本・non-staggered で重みが非負なので、区別するために引く** |
+| Callaway–Goodman-Bacon–Sant'Anna | 連続処置 DiD。本稿の設定に最も近い。掲載状況を確認 |
+| Goodman-Bacon (2021) / Borusyak–Jaravel–Spiess (2024) | 分解と event study 設計の estimand |
+| Angrist (1998) / Løken–Mogstad–Wiswall (2012) | 分散加重平均としての OLS。$\omega_t$ の系譜 |
+| Ibragimov & Müller (2010) / Canay–Romano–Shaikh (2017) | 少数群（G=6）での妥当な推論。都県ブロックの wild bootstrap を置き換える |
+| Conley (1999) / Conley & Taber (2011) | 空間HAC と少数事象の推論 |
 
 ---
 
@@ -532,6 +578,18 @@ M2後半  ：修了（3月または9月）→ PhD入学
 ---
 
 ## 8. 参照文献（主要）
+
+**計量：TWFE の estimand・連続処置 DiD・少数クラスター推論**（卒論の主結果。**書誌は要確認**。`goals_and_todo.md` §5 と重複）
+- de Chaisemartin, C., & D'Haultfoeuille, X. (2020). "Two-Way Fixed Effects Estimators with Heterogeneous Treatment Effects." *American Economic Review*
+- Goodman-Bacon, A. (2021). "Difference-in-Differences with Variation in Treatment Timing." *Journal of Econometrics*
+- Borusyak, K., Jaravel, X., & Spiess, J. (2024). "Revisiting Event Study Designs: Robust and Efficient Estimation." *Review of Economic Studies*
+- Callaway, B., Goodman-Bacon, A., & Sant'Anna, P. "Difference-in-Differences with a Continuous Treatment"（掲載状況を確認）
+- Angrist, J.D. (1998); Løken, K., Mogstad, M., & Wiswall, M. (2012) — 分散加重平均としての OLS
+- Ibragimov, R., & Müller, U.K. (2010). "t-Statistic Based Correlation and Heterogeneity Robust Inference." *Journal of Business & Economic Statistics*
+- Canay, I.A., Romano, J.P., & Shaikh, A.M. (2017). "Randomization Tests under an Approximate Symmetry Assumption." *Econometrica*
+- Conley, T.G. (1999). "GMM Estimation with Cross Sectional Dependence." *Journal of Econometrics*
+- Conley, T.G., & Taber, C.R. (2011). "Inference with ‘Difference in Differences’ with a Small Number of Policy Changes." *Review of Economics and Statistics*
+- Young, A. (2019). "Channeling Fisher: Randomization Tests and the Statistical Insignificance of Seemingly Significant Experimental Results." *Quarterly Journal of Economics*
 
 **構造推定・産業組織論**
 - Berry, S. (1994). "Estimating Discrete-Choice Models of Product Differentiation." *RAND Journal of Economics*
