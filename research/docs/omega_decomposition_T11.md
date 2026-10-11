@@ -193,7 +193,15 @@ $\delta_{2010}$ = **+0.003555** が、年別に推定した2010年の緩和効�
 
 ### 7.3 残る作業
 
-- SE。本稿の数値はすべて点推定で、$\omega_t$ の推定誤差も $\delta_t$ の SE も扱っていない。$\omega_t$ はデータの関数なので、$\sum\omega_t\delta_t$ の SE は delta method か bootstrap が要る → T12
+**SE について、$\omega_t$ に推定誤差はない。** $\omega_t$ は回帰子行列（FE・$X$・$r$）だけの関数で $y$ が入らないので、$X$ に条件付ける枠組みでは定数である。したがって $\mathrm{Var}(\sum_t\omega_t\hat\delta_t)=\omega'\mathrm{Var}(\hat\delta)\,\omega$ で、**固定ウェイトの線形結合の分散**にすぎない。主項・汚染項も同じ。
+
+> **【2026年10月11日 訂正】** 当初ここに「$\omega_t$ はデータの関数なので $\sum\omega_t\delta_t$ の SE は delta method か bootstrap が要る」と書いたが**誤り**。$X$ に条件付ければ $\omega_t$ は定数で、年別交差式の VCV から直接出る。`goals_and_todo.md` §3.6 参照。
+
+したがって T12 が供給すべきは SE の計算法ではなく $\widehat{\mathrm{Var}}(\hat\delta)$ そのものである。残作業は
+
+- **$\widehat{\mathrm{Var}}(\hat\delta)$ を市町村クラスター／Conley／IM で作る**（T12）。これができれば主項・汚染項・$\delta_{2010}$・同質性検定の推論がすべて落ちる
+- **同質性検定（$\delta_1=\cdots=\delta_{24}$）の Wald。** 本稿の主張「プールは妥当でない」に対応する形式的検定。23制約なので $G\ge24$ が必要で、**都県クラスター（$G$ = 6）では原理的に実行できない**（`goals_and_todo.md` §3.3）
+- **$\hat\delta_t$ 系列の自己相関の測定。** 年 permutation の脅威の大きさを確定させる（同 §3.1）
 - 年FE 版と都県×年FE 版の比較。本稿は年FE（`estimate.R` と同じ）。都県×年FE で重みの分布がどう変わるか
 - 非対称スペック（T10）での再計算。本稿は `obs_HD35` の線形版
 
