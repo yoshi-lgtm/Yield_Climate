@@ -78,3 +78,61 @@ tot = cen.paddy_area.sum()
 inp = cen.loc[cen.in_panel, "paddy_area"].sum()
 print("関東全体の田面積のうち推定パネルがカバーする割合: %.1f%%" % (inp / tot * 100))
 print("保存:", OUT_DIR / "sample_den_by_pref.csv", "/", OUT_DIR / "sample_paddy_coverage.csv")
+
+# -----------------------------------------------------------------------------
+# 3. 3つの「田面積」の比較と、consol30 の分母カバー率
+#
+#    den_ha  : センサス「0.2ha 以上の区画の田」（2010年2月1日、ha）
+#    mesh_ha : 土地利用メッシュの「田」（区画規模を問わない、ha 換算）
+#    作付面積（作物統計）はその年に水稲を作付けした面積で、上の2つとは別物。
+#    kanto_yield.csv には 10a 当たり収量しか入っていないので本スクリプトでは扱わない。
+# -----------------------------------------------------------------------------
+rows = []
+for code, name in PREF_NAME.items():
+    f = Path("Consolidation_data") / ("GA0001_2014_2010_%02d.xlsx" % code)
+    d = pd.read_excel(f, dtype=str)
+    cols = [c for c in d.columns if c.strip() in want]
+    tot = d[(d.CITY == "000") & (d.KCITY == "00") & (d.RCOM == "000")]
+    v = sum(pd.to_numeric(tot[c], errors="coerce").fillna(0).sum() for c in cols)
+    rows.append(dict(pref=code, pref_name=name, den_ha=round(v, 1)))
+meas = pd.DataFrame(rows)
+mesh = cen.groupby("pref")["paddy_area"].sum().reset_index()
+mesh["mesh_ha"] = (mesh.paddy_area / 10000).round(0)
+meas = meas.merge(mesh[["pref", "mesh_ha"]], on="pref")
+meas["ge02ha_share_pct"] = (meas.den_ha / meas.mesh_ha * 100).round(1)
+meas.to_csv(OUT_DIR / "sample_area_measures.csv", index=False, encoding="utf-8-sig")
+
+print("\n=== 3つの田面積の比較（都県計）===")
+print(meas.to_string(index=False))
+print("ge02ha_share_pct = 田のうち 0.2ha 以上の区画が占める割合")
+
+# 市町村レベル: consol30 の分母が田全体のどれだけを捉えているか
+pan = (pd.read_csv("research/model/kanto_panel_2000_2023.csv",
+                   usecols=["city_id", "consol30", "den"])
+       .drop_duplicates("city_id"))
+mm = pan.merge(cen[["city_id", "paddy_area"]], on="city_id")
+mm["mesh_ha"] = mm.paddy_area / 10000
+mm = mm[(mm.mesh_ha > 0) & mm.den.notna() & mm.consol30.notna()].copy()
+mm["cover"] = mm.den / mm.mesh_ha
+mm["pref"] = mm.city_id // 1000
+
+q = mm.cover.quantile([.1, .25, .5, .75, .9]).round(3)
+print("\n=== 市町村レベル: 分母カバー率 cover = den / メッシュの田面積（n = %d）===" % len(mm))
+print("10%% %.3f / 25%% %.3f / 中央 %.3f / 75%% %.3f / 90%% %.3f"
+      % (q[.1], q[.25], q[.5], q[.75], q[.9]))
+print("cover > 1 の件数（センサス > メッシュ。ラスタ解像度と土地利用版の差）: %d"
+      % int((mm.cover > 1).sum()))
+print("corr(consol30, cover): Pearson %.3f / Spearman %.3f"
+      % (mm.consol30.corr(mm.cover), mm.consol30.corr(mm.cover, method="spearman")))
+mm["cover_q"] = pd.qcut(mm.cover, 4, labels=["Q1", "Q2", "Q3", "Q4"])
+byq = (mm.groupby("cover_q", observed=True)
+       .agg(n=("consol30", "size"), consol30=("consol30", "mean"), cover=("cover", "mean"))
+       .round(3).reset_index())
+print(byq.to_string(index=False))
+bypref = (mm.groupby("pref").agg(n=("consol30", "size"), cover=("cover", "mean"),
+                                 consol30=("consol30", "mean")).round(3).reset_index())
+bypref["pref_name"] = bypref.pref.map(PREF_NAME)
+print(bypref[["pref_name", "n", "cover", "consol30"]].to_string(index=False))
+mm[["city_id", "pref", "den", "mesh_ha", "cover", "consol30"]].to_csv(
+    OUT_DIR / "sample_cover_by_city.csv", index=False, encoding="utf-8-sig")
+print("保存:", OUT_DIR / "sample_area_measures.csv", "/", OUT_DIR / "sample_cover_by_city.csv")
