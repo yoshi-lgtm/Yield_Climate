@@ -4,6 +4,7 @@
 **対象：`goals_and_todo.md` T11（主結果）の実施**
 **スクリプト：`research/model/omega_decomposition.R`**
 **標本：関東6県・2000–2023・4,584行・209市町村**（`estimate.R` と同一の共通標本）
+**スペック（2026年10月13日に明記）：処置は水準 `obs_HD35`**（実測登熟期窓の 35.0℃以上日数）であり、$H^{+}=\max(\text{heat}-\bar h_i,0)$ ではない。交差項は `h_consol = obs_HD35 * consol30`、コントロールは 7–8月固定暦月の `GSR_78`・`APCP_78`。本文書の全数値はこの水準スペックの結果である。定義の詳細は `heat_definition_2026-10.md`
 
 ---
 
