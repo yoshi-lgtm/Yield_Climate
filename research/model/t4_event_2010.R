@@ -57,8 +57,18 @@ ev <- fread(ELEV, encoding = "UTF-8")[, .(city_id, elev, slope, relief)]
 d <- merge(d, ev, by = "city_id", all.x = TRUE)
 d[, log_elev := log1p(elev)]
 
+# 海岸距離（Data_cleaning/14build_city_coastdist.py）。T4 第2.5節で標高が
+# 否定されたので、経度の代理候補の残り第一候補。経度との相関は -0.594。
+CDIST <- if (file.exists("results/city_coastdist.csv")) {
+  "results/city_coastdist.csv"
+} else { "Yield_Climate/results/city_coastdist.csv" }
+cd <- fread(CDIST, encoding = "UTF-8")[, .(city_id, coast = coast_km)]
+d <- merge(d, cd, by = "city_id", all.x = TRUE)
+d[, log_coast := log1p(coast)]
+
 vars <- c("log_yield", HEAT, "consol30", "pipe", "paddy_fix", "den",
-          "elev", "log_elev", "slope", CTRL, "city_id", "year", "lon", "lat")
+          "elev", "log_elev", "slope", "coast", "log_coast",
+          CTRL, "city_id", "year", "lon", "lat")
 s <- d[complete.cases(d[, ..vars])][den > 0]
 s[, pref := city_id %/% 1000L]
 years <- sort(unique(s$year)); REF <- years[1]
@@ -70,7 +80,8 @@ cat(sprintf("n = %d, 市町村 = %d, 都県 = %d, 年 = %d\n",
 #    consol30 だけは既存文書と数値を揃えるため生のまま使う。
 # -----------------------------------------------------------------------------
 s[, log_den := log(den)]
-COMP <- c("pipe", "paddy_fix", "log_den", "lat", "lon", "elev", "log_elev", "slope")
+COMP <- c("pipe", "paddy_fix", "log_den", "lat", "lon", "elev", "log_elev",
+          "slope", "coast", "log_coast")
 cs <- unique(s[, c("city_id", COMP), with = FALSE])
 for (v in COMP) {
   mu <- mean(cs[[v]]); sg <- sd(cs[[v]])
@@ -169,9 +180,11 @@ for (k in seq_along(Z)) {
 # 下げるので、この2本の同時投入が (c) に対する最も厳しい検定になる。
 # 標高は経度と -0.497 で相関する。「経度は標高の代理か」を直接問うため、
 # elev と lon を同時に入れてどちらが2010年の交差項を担うかを見る。
-GRP <- list(c("z_lat", "z_lon"), c("z_elev", "z_slope"),
-            c("z_elev", "z_lon"), c("z_log_elev", "z_lon"),
-            c("z_elev", "z_lat", "z_lon"), Z)
+GRP <- list(c("z_lat", "z_lon"), c("z_elev", "z_lon"),
+            c("z_elev", "z_lat", "z_lon"),
+            c("z_coast", "z_lon"), c("z_log_coast", "z_lon"),
+            c("z_coast", "z_elev"), c("z_coast", "z_lat", "z_lon"),
+            c("z_coast", "z_elev", "z_lat", "z_lon"), Z)
 for (g in GRP) {
   r <- run_sat(sprintf("+ %s（年飽和）",
                        paste(sub("^z_", "", g), collapse = "+")), g)
