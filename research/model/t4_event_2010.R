@@ -66,9 +66,17 @@ cd <- fread(CDIST, encoding = "UTF-8")[, .(city_id, coast = coast_km)]
 d <- merge(d, cd, by = "city_id", all.x = TRUE)
 d[, log_coast := log1p(coast)]
 
+# 森林率（Data_cleaning/15build_city_forest.py）。標高・傾斜とは別の機序
+# （日中の遮蔽・冷気流出）の候補。経度との相関は -0.248/-0.144 と弱い。
+FRST <- if (file.exists("results/city_forest.csv")) {
+  "results/city_forest.csv"
+} else { "Yield_Climate/results/city_forest.csv" }
+fr <- fread(FRST, encoding = "UTF-8")[, .(city_id, forest_city, forest_nbr)]
+d <- merge(d, fr, by = "city_id", all.x = TRUE)
+
 vars <- c("log_yield", HEAT, "consol30", "pipe", "paddy_fix", "den",
           "elev", "log_elev", "slope", "coast", "log_coast",
-          CTRL, "city_id", "year", "lon", "lat")
+          "forest_city", "forest_nbr", CTRL, "city_id", "year", "lon", "lat")
 s <- d[complete.cases(d[, ..vars])][den > 0]
 s[, pref := city_id %/% 1000L]
 years <- sort(unique(s$year)); REF <- years[1]
@@ -81,7 +89,7 @@ cat(sprintf("n = %d, 市町村 = %d, 都県 = %d, 年 = %d\n",
 # -----------------------------------------------------------------------------
 s[, log_den := log(den)]
 COMP <- c("pipe", "paddy_fix", "log_den", "lat", "lon", "elev", "log_elev",
-          "slope", "coast", "log_coast")
+          "slope", "coast", "log_coast", "forest_city", "forest_nbr")
 cs <- unique(s[, c("city_id", COMP), with = FALSE])
 for (v in COMP) {
   mu <- mean(cs[[v]]); sg <- sd(cs[[v]])
@@ -184,7 +192,11 @@ GRP <- list(c("z_lat", "z_lon"), c("z_elev", "z_lon"),
             c("z_elev", "z_lat", "z_lon"),
             c("z_coast", "z_lon"), c("z_log_coast", "z_lon"),
             c("z_coast", "z_elev"), c("z_coast", "z_lat", "z_lon"),
-            c("z_coast", "z_elev", "z_lat", "z_lon"), Z)
+            c("z_coast", "z_elev", "z_lat", "z_lon"),
+            c("z_forest_nbr", "z_coast"),
+            c("z_forest_nbr", "z_elev"),
+            c("z_coast", "z_elev", "z_forest_nbr"),
+            c("z_forest_nbr", "z_lon"), Z)
 for (g in GRP) {
   r <- run_sat(sprintf("+ %s（年飽和）",
                        paste(sub("^z_", "", g), collapse = "+")), g)
