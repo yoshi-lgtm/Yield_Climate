@@ -8,7 +8,7 @@
 #        results/city_centroids.csv
 # 出力 : research/model/output/t15_*.csv と標準出力
 #
-# goals_and_todo.md T15、estimand_window_policy_2026-10.md 第3節。
+# 261004_goals_and_todo.md T15、261023_estimand_window_policy.md 第3節。
 #
 # 2010年産は米戸別所得補償モデル事業の実施年（Yield_Climate/subsidy_ricefarmer.pdf）。
 # 年FE は共通ショックを吸収するので、脅威は 2010 × consol30 の差別的効果のみ。

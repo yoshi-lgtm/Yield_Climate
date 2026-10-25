@@ -17,7 +17,7 @@ import pandas as pd
 
 PREF_NAME = {8: "茨城", 9: "栃木", 10: "群馬", 11: "埼玉", 12: "千葉",
              13: "東京", 14: "神奈川"}
-# consol30 の分母 den を構成する6列（analysis_review_2026-09.md 第6.2節）
+# consol30 の分母 den を構成する6列（260910_analysis_review.md 第6.2節）
 SZ = ["田（1ha以上）", "田（0．5～1．0ha）", "田（0．3～0．5haほ区均平）",
       "田（0．3～0．5haその他）", "田（0．2～0．3haほ区均平）", "田（0．2～0．3haその他）"]
 OUT_DIR = Path("research/model/output")

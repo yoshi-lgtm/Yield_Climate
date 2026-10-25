@@ -2,7 +2,7 @@
 
 **作成日：2026年10月23日**（最終更新：2026年10月25日 — 論文の軸・後半の構成・経路依存の開示・区間推定を確定。T20 を反映）
 **対象：この時点での到達点を、論文の5節（背景／データ／識別／結果／考察）に当てはめて整理したもの**
-**根拠文書：`research_portfolio_summary.md`、`goals_and_todo.md`、`estimand_window_policy_2026-10.md`、`omega_decomposition_T11.md`、`vcov_inference_T12.md`、`policy_saturation_T15.md`、`event_2010_horse_race_T4.md`、`omega_mechanism_T18.md`、`im_mechanism_T19.md`、`ladder_intervals_T20.md`**
+**根拠文書：`research_portfolio_summary.md`、`261004_goals_and_todo.md`、`261023_estimand_window_policy.md`、`261011_omega_decomposition_T11.md`、`261012_vcov_inference_T12.md`、`261023_policy_saturation_T15.md`、`261023_event_2010_horse_race_T4.md`、`261023_omega_mechanism_T18.md`、`261023_im_mechanism_T19.md`、`261025_ladder_intervals_T20.md`**
 
 > **一行で**：連続処置を24年でプールした TWFE 推定量が何を識別しているかを恒等式で特定し、**報告値の約3割が「圃場整備の緩和効果」ではなく「海洋性の緩和効果」であること**、および **$\delta$ の見かけの異質性が時間方向でも空間方向でも同一の脱落交互作用に帰着すること**を示す。
 
@@ -25,7 +25,7 @@
 
 **estimand 論**：de Chaisemartin & D'Haultfœuille (2020)、Goodman-Bacon (2021)、Borusyak–Jaravel–Spiess (2024)、Callaway–Goodman-Bacon–Sant'Anna (2025、連続処置 DiD で最も近い)、Ishimaru。系譜は Angrist (1998)・Løken–Mogstad–Wiswall (2012) の分散加重平均としての OLS。
 
-**本稿の立場は既存の estimand 論を実データに当てることに留める**（新しい推定量は提案しない。`goals_and_todo.md` 非Goal）。
+**本稿の立場は既存の estimand 論を実データに当てることに留める**（新しい推定量は提案しない。`261004_goals_and_todo.md` 非Goal）。
 
 > **注意**：dCDH は当初「本稿は重みが非負なので区別するために引く」と書いていたが、T11 で非負性は撤回済み（実測で 8〜12年の重みが負）。**本稿は同論文系列の複数処置の場合そのものであり、区別するためではなく位置づけを強めるために引く。**
 
@@ -111,7 +111,7 @@ $$\ln y_{it} = \alpha_i + \tau_t + \sum_{t\neq 2000}\mathbb{1}[t]\big(c_i + \tex
 | `elev` | 逓減率は気温の**水準**に効くが、水準は HD35 自体に入っている | 頑健性 |
 | `lat` / `lon` | **ない**（座標そのものに機序はない） | 頑健性 |
 
-$\chi^2$ で選べば 24.1 まで下げられるが、それは**報告する当の検定の統計量でスペックを選ぶ post-selection** であり、`goals_and_todo.md` §3.2 で年 permutation を落としたのと同じ誤りになる。**本文にこの選択基準を明記する。**
+$\chi^2$ で選べば 24.1 まで下げられるが、それは**報告する当の検定の統計量でスペックを選ぶ post-selection** であり、`261004_goals_and_todo.md` §3.2 で年 permutation を落としたのと同じ誤りになる。**本文にこの選択基準を明記する。**
 
 機序で選んだペアは**識別の面でも最良**だった（推定標本での相互相関 0.110 で両方有意。`coast`+`elev` は 0.667 で `elev` が潰れる）。
 
@@ -263,7 +263,7 @@ $\beta_t$ 由来の汚染項と**同じ系統の現象**なので論文の筋は
 | **名前のある汚染** | `heat × coast` 由来が **+28.2%**（クラスター t 4.71 ／ Conley t 2.93、**どちらも区間がゼロを除外**）。統制を順に追加した表で、名前が付く過程（R2）を見せる |
 | **残ったもの** | 主項は区間がゼロを含む（t 1.35）。(a) は IM で [-0.0035, +0.0024]。**残ったのは地理的修飾であって整備率ではない** |
 
-**後半は案2（下記）に決定。** 本文と Appendix の切り分けは `ladder_intervals_T20.md` §5.2。**$eta_t$ の非定常性と被害関数の非対称性は検証はするが、限界として言及し詳細は Appendix に送る。**
+**後半は案2（下記）に決定。** 本文と Appendix の切り分けは `261025_ladder_intervals_T20.md` §5.2。**$eta_t$ の非定常性と被害関数の非対称性は検証はするが、限界として言及し詳細は Appendix に送る。**
 
 ### 5.3.1 経路依存の開示（本文に置く）
 

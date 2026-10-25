@@ -4,7 +4,7 @@
 # 実行はリポジトリルート(Yield_Climate/)またはその親から:
 #   "C:/Program Files/R/R-4.4.3/bin/Rscript.exe" research/model/exchangeability_diag.R
 #
-# goals_and_todo.md 第3.1節 の脅威を数値で確定させる。
+# 261004_goals_and_todo.md 第3.1節 の脅威を数値で確定させる。
 #   交換可能性 = 同時分布が並べ替えに対して不変
 #   2次モーメントでの必要条件は「分散が全年で等しい」かつ「対相関が全年対で等しい」
 #     脅威2（精度の不均一）  -> 対角のばらつき

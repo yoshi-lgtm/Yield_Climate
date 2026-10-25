@@ -4,11 +4,11 @@
 > 作物統計調査の実測耕種期日（`calender_data/`）で検証したところ、群馬 -25日・東京 -27日・
 > 神奈川 -23日・埼玉 -7日のずれがあった（GDD閾値1000という較正自体は正しかった）。
 > §3.1「登熟20日窓は現行より悪い」と §4「低温側もU字型」は、この仮定ずれによる人工物である。
-> **較正後の結果は `phenology_calibrated_2026-09.md` を参照のこと。**
+> **較正後の結果は `260918_phenology_calibrated.md` を参照のこと。**
 > §7（実装上の問題）と §2.1〜2.2（GDDの手法）は有効。
 
 **作成日：2026年9月15日**
-**対象：`analysis_review_2026-09.md` §9「次の一手」1〜3の実施**
+**対象：`260910_analysis_review.md` §9「次の一手」1〜3の実施**
 **標本：関東6都県・2009–2020・201市町村・2,248行（圃場整備率マージ後）**
 
 ---
@@ -36,7 +36,7 @@
 |---|---|
 | `Data_cleaning/03b_add_tmp_min.py` | **新規**。`TMP_min` の市町村別・田面積加重平均を構築（03から漏れていた） |
 | `Data_cleaning/06phenology_heat.py` | **新規**。GDDによる出穂日推定 → 登熟期窓の気象変数 → 気温ビン |
-| `research/model/twfe.py` | **新規**。TWFE＋クラスターSEの自前実装（~~環境に fixest / linearmodels なし~~ → **【9/18訂正】fixest 0.14.0 は最初から入っていた。`Rscript` が PATH 外で確認コマンドが空振りしていたのが原因。linearmodels が無いのは事実。詳細は `panel_extension_2000_2023.md` §9.2**） |
+| `research/model/twfe.py` | **新規**。TWFE＋クラスターSEの自前実装（~~環境に fixest / linearmodels なし~~ → **【9/18訂正】fixest 0.14.0 は最初から入っていた。`Rscript` が PATH 外で確認コマンドが空振りしていたのが原因。linearmodels が無いのは事実。詳細は `260918_panel_extension_2000_2023.md` §9.2**） |
 | `research/model/model_phenology.py` | **新規**。パネル構築と基本推定 |
 | `research/model/heat_definition_test.py` | **新規**。heat 定義の horse race・encompassing・感度分析 |
 
@@ -299,7 +299,7 @@ df_heat = df.groupby(...)['heat'].sum()
 - 推定標本：201市町村・2,248行 → **208市町村・2,321行**（`kanto_consol.csv` の全件）
 - 復活した市町村：成田・土浦・鹿嶋・かすみがうら・行方・茨城町（＋栃木県藤岡1年）
 
-**結論への影響はなかった**（`phenology_calibrated_2026-09.md` §8 参照）。
+**結論への影響はなかった**（`260918_phenology_calibrated.md` §8 参照）。
 
 ### 7.3 東京都は圃場整備率データで全滅
 

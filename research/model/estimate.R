@@ -1,5 +1,5 @@
 # =============================================================================
-# 推定の正本: research/docs/panel_extension_2000_2023.md の全表を再現する
+# 推定の正本: research/docs/260918_panel_extension_2000_2023.md の全表を再現する
 #
 # 実行はリポジトリルート(Yield_Climate/)から:
 #   "C:/Program Files/R/R-4.4.3/bin/Rscript.exe" research/model/estimate.R

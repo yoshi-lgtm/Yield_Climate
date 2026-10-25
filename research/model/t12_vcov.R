@@ -8,7 +8,7 @@
 #        results/city_centroids.csv (Data_cleaning/11build_city_centroids.py)
 # 出力 : research/model/output/t12_*.csv と標準出力
 #
-# goals_and_todo.md 第3.3節。帰無仮説ごとに使える手法が違う。
+# 261004_goals_and_todo.md 第3.3節。帰無仮説ごとに使える手法が違う。
 #   (a) delta_2010 = 0       1制約  -> 市町村クラスター / Conley / IM
 #   (c) delta_t が全年同一   23制約 -> 市町村クラスター / Conley
 #                                      （クラスターVCVの階数は高々 G-1）

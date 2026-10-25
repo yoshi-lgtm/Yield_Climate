@@ -1,7 +1,7 @@
 """
 GDD積算による出穂日推定と、登熟期の気象変数の構築。
 
-背景（research/docs/analysis_review_2026-09.md §7, §9-2）:
+背景（research/docs/260910_analysis_review.md §7, §9-2）:
     現行の heat は「7-8月の固定暦月で TMP_max>=34 の日数」であり、
     出穂・登熟期の年次・地域変動を捉えていない（within R^2 = 0.025）。
     設計文書（research/slides/research_plan.md §4）の方針どおり、

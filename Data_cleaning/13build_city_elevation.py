@@ -4,7 +4,7 @@
 # 実行はリポジトリルート(Yield_Climate/)から:
 #   python Data_cleaning/13build_city_elevation.py
 #
-# T4（event_2010_horse_race_T4.md）で、heat × 経度の2010年交差項が
+# T4（261023_event_2010_horse_race_T4.md）で、heat × 経度の2010年交差項が
 # t = 4.1〜4.4 で頑健に効き、heat × 緯度・経度を年飽和で入れると
 # delta_t の同質性が棄却されなくなった。経度が何の代理かを特定する必要があり、
 # 第一候補が標高である（関東は西が山地、東が平野）。

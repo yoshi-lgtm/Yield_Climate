@@ -8,7 +8,7 @@
 #        results/city_centroids.csv
 # 出力 : research/model/output/t4_*.csv と標準出力
 #
-# goals_and_todo.md G1/T4。本番スペックは T15 の飽和版（年 × consol30 入り）。
+# 261004_goals_and_todo.md G1/T4。本番スペックは T15 の飽和版（年 × consol30 入り）。
 #
 # T4 の本体は horse race である（頑健性ではない）。delta の識別仮定は
 # 「heat 曝露を条件づけたとき、consol30 と相関する他の市町村特性が高温被害を

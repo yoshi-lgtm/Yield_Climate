@@ -4,7 +4,7 @@
 標本: 関東7都県 × 2009-2020（圃場整備率 consol30/pipe をマージできる期間）
 仕様: ln(yield) を市町村FE + 年FE、city_id クラスターSE。
 
-研究上の問い（research/docs/analysis_review_2026-09.md §9）:
+研究上の問い（research/docs/260910_analysis_review.md §9）:
   (1) 固定暦月の heat を登熟期ベースの指標に置き換えると within R^2 は上がるか
   (2) 上がった heat 指標のもとで heat × consol30 の交差項はまだゼロか
 
