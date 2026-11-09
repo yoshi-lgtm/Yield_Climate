@@ -61,6 +61,8 @@ vv <- c("log_yield", HEAT, "consol30", "coast", "forest", "elev", "lon", "lat",
 s <- d[complete.cases(d[, ..vv])]
 s[, pref := city_id %/% 1000L]
 years <- sort(unique(s$year))
+# Conley 用に、標準化する前の生の緯度経度を別列で保存する（T20 の修正 2026-11-02）
+s[, `:=`(lat_deg = lat, lon_deg = lon)]
 cs <- unique(s[, c("city_id", c("coast", "forest", "elev", "lon", "lat")), with = FALSE])
 for (v in c("coast", "forest", "elev", "lon", "lat")) {
   mu <- mean(cs[[v]]); sg <- sd(cs[[v]])
@@ -146,7 +148,7 @@ decomp <- function(label, slopes, levvars, gvar = "year", dat = s, vcvs = TRUE) 
 
   for (vl in c("cluster", sprintf("conley%d", CONLEY))) {
     V <- if (vl == "cluster") vcov(ms) else
-      tryCatch(suppressWarnings(vcov_conley(ms, lat = ~lat, lon = ~lon,
+      tryCatch(suppressWarnings(vcov_conley(ms, lat = ~lat_deg, lon = ~lon_deg,
                                             cutoff = CONLEY, ssc = ssc(K.fixef = "full"))),
                error = function(e) NULL)
     if (is.null(V)) next
